@@ -35,9 +35,10 @@ FIELDS = [
     "pre_roi",
     "is_new_book_format",
     "is_anime_desc",
+    "media",
 ]
-SHORT_KEYS = list("abcdefghijklmnop")
-DICT_KEYS = set("abcdefghiop")  # string fields → dictionary encoded
+SHORT_KEYS = list("abcdefghijklmnopq")
+DICT_KEYS = set("abcdefghiopq")  # string fields → dictionary encoded
 RAW_KEYS = set("jklmn")  # numeric fields → raw string values
 SPLIT_THRESHOLD_MB = 20
 OUTPUT_DIR = "data"
