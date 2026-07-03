@@ -35,7 +35,7 @@ FIELDS = [
     "pre_roi",
     "is_new_book_format",
     "is_anime_desc",
-    "media",
+    "channel_code_name",
 ]
 SHORT_KEYS = list("abcdefghijklmnopq")
 DICT_KEYS = set("abcdefghiopq")  # string fields → dictionary encoded
