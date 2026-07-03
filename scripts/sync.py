@@ -35,10 +35,12 @@ FIELDS = [
     "pre_roi",
     "is_new_book_format",
     "is_anime_desc",
+    "media",
     "channel_code_name",
+    "channel_code",
 ]
-SHORT_KEYS = list("abcdefghijklmnopq")
-DICT_KEYS = set("abcdefghiopq")  # string fields → dictionary encoded
+SHORT_KEYS = list("abcdefghijklmnopqrs")
+DICT_KEYS = set("abcdefghiopqrs")  # string fields → dictionary encoded
 RAW_KEYS = set("jklmn")  # numeric fields → raw string values
 SPLIT_THRESHOLD_MB = 20
 OUTPUT_DIR = "data"
@@ -106,6 +108,10 @@ def fetch_dasheng(token: str) -> list[dict]:
                 resp.raise_for_status()
                 data = resp.json()
                 records = data.get("data") or []
+                if records and i == 0:
+                    print(f"      [DIAG] First record fields ({len(records[0])} keys):")
+                    for k, v in sorted(records[0].items()):
+                        print(f"        {k} = {repr(v)[:60]}")
                 all_records.extend(records)
                 print(f"      {dt} : {len(records)} records"
                       + (" (retry OK)" if attempt > 0 else ""))
