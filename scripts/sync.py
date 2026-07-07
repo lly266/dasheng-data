@@ -36,9 +36,10 @@ FIELDS = [
     "is_new_book_format",
     "is_anime_desc",
     "media_name",
+    "put_type",
 ]
-SHORT_KEYS = list("abcdefghijklmnopq")
-DICT_KEYS = set("abcdefghiopq")  # string fields → dictionary encoded
+SHORT_KEYS = list("abcdefghijklmnopqr")
+DICT_KEYS = set("abcdefghiopqr")  # string fields → dictionary encoded
 RAW_KEYS = set("jklmn")  # numeric fields → raw string values
 SPLIT_THRESHOLD_MB = 20
 OUTPUT_DIR = "data"
@@ -135,8 +136,15 @@ def fetch_dasheng(token: str) -> list[dict]:
 # ===== Step 2: Filter =====
 def filter_records(records: list[dict]) -> list[dict]:
     """Keep only records with consume > 0 and trim to essential fields."""
-    print("[2/4] Filtering records (consume > 0, trim fields)...")
+    print("[2/4] Filtering records (consume > 0, trim fields)...", flush=True)
     filtered = []
+    # Diagnostic: collect unique put_type values
+    put_type_values = set()
+    for r in records:
+        pt = r.get("put_type", "")
+        if pt is not None:
+            put_type_values.add(str(pt))
+    print(f"      [DIAG] put_type unique values: {sorted(put_type_values)}", flush=True)
     for r in records:
         try:
             consume = float(r.get("consume", 0) or 0)
