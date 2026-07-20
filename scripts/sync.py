@@ -17,7 +17,7 @@ API_URL = (
     "https://market.wuread.cn/market-admin/adminNew/api/2611"
     "?limit=&offset=&sort=&order=desc&pageNo=1&pageSize=50000"
 )
-DAYS = 7
+DAYS = 8
 FIELDS = [
     "agent_user_name",
     "service_provider_name",
