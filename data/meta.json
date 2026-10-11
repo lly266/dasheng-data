@@ -1,1 +1,1 @@
-{"sync_time":"2026-10-11T18:17:02+08:00","record_count":155691,"file_layout":"split","files":["part1.json","part2.json"],"days":8,"source":"dasheng-api"}
+{"sync_time":"2026-10-12T00:23:51+08:00","record_count":149379,"file_layout":"single","files":["latest.json"],"days":8,"source":"dasheng-api"}
