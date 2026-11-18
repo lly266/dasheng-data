@@ -110,7 +110,10 @@ def main() -> int:
     ap.add_argument("--out", default=str(OUT_FILE))
     args = ap.parse_args()
 
-    if args.all:
+    sdate_arg = (args.sdate or "").strip()
+    edate_arg = (args.edate or "").strip()
+    if args.all or (not sdate_arg and not edate_arg):
+        # --all 或未显式给日期（CI 定时任务传空参数即走这里）：全量拉取，覆盖所有首投日期
         sdate, edate = "", ""
         params = {
             "source": "tencent",                     # 只看腾讯媒体
@@ -131,7 +134,7 @@ def main() -> int:
 
     print("=" * 60)
     print("  新媒体短剧榜单拉取（reinvest/list · source=tencent）")
-    print(f"  首日投放窗口：{'全量（不限首投日期）' if args.all else sdate + ' ~ ' + edate}")
+    print(f"  首日投放窗口：{'全量（不限首投日期）' if (args.all or (not sdate_arg and not edate_arg)) else sdate + ' ~ ' + edate}")
     print(f"  业务线：{'不限' if args.no_business_lines else BUSINESS_LINES}")
     print("=" * 60, flush=True)
 
