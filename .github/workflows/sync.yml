@@ -2,8 +2,16 @@ name: Sync Dasheng Data
 
 on:
   schedule:
+    # UTC 0:00-14:00 = Beijing 8:00-22:00, every 30 minutes
     - cron: '0,30 0-14 * * *'
   workflow_dispatch:
+    inputs:
+      sdate:
+        description: '分媒体拉取起始日期 YYYY-MM-DD（留空=近 7 天）'
+        required: false
+      edate:
+        description: '分媒体拉取结束日期 YYYY-MM-DD（留空=今天）'
+        required: false
 
 concurrency:
   group: sync-data
@@ -33,6 +41,23 @@ jobs:
         env:
           DASHENG_TOKEN: ${{ secrets.DASHENG_TOKEN }}
 
+      # 分媒体消耗（api/2617）：供看板「跨媒体选剧」视图使用；失败不阻断主数据同步
+      - name: Fetch media split (api/2617)
+        continue-on-error: true
+        run: python scripts/fetch_media_split.py
+        env:
+          DASHENG_TOKEN: ${{ secrets.DASHENG_TOKEN }}
+          SDATE: ${{ inputs.sdate }}
+          EDATE: ${{ inputs.edate }}
+
+      # 新媒体短剧榜单（reinvest/list · source=tencent）：提供首日投放日期与榜单消耗
+      - name: Fetch reinvest list (ztdoc)
+        continue-on-error: true
+        run: python scripts/fetch_reinvest.py --sdate "$SDATE" --edate "$EDATE"
+        env:
+          SDATE: ${{ inputs.sdate }}
+          EDATE: ${{ inputs.edate }}
+
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
@@ -46,7 +71,14 @@ jobs:
         if: success()
         run: |
           echo "Purging CDN cache..."
-          for f in meta.json latest.json part1.json part2.json; do
+          for f in meta.json latest.json part1.json part2.json media_split.json reinvest_tencent.json; do
             curl -sf "https://purge.jsdelivr.net/gh/lly266/dasheng-data@main/data/$f" || true
+            curl -sf "https://purge.jsdelivr.net/gh/lly266/dasheng-data@main/data/merged/$f" || true
+          done
+          echo "Waiting for CDN propagation..."
+          sleep 10
+          for f in meta.json latest.json part1.json part2.json media_split.json reinvest_tencent.json; do
+            curl -sf "https://purge.jsdelivr.net/gh/lly266/dasheng-data@main/data/$f" || true
+            curl -sf "https://purge.jsdelivr.net/gh/lly266/dasheng-data@main/data/merged/$f" || true
           done
           echo "CDN cache purged."
